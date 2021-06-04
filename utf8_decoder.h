@@ -23,17 +23,17 @@
 #ifndef UTF8_DECODER_H
 #define UTF8_DECODER_H
 
-#if defined (_MSC_VER) && (_MSC_VER < 1920)
-typedef __int32 int32_t;
+#if defined (_MSC_VER)
+    typedef __int32 int32_t;
+    #pragma warning (disable: 4309)
 #else
-#include <stdint.h>
+    #include <stdint.h>
 #endif
 
 #include <stdbool.h>
-#include <string.h>
 
 #if defined (UTF8_DECODER_LOG)
-#include "logger.h"
+    #include "logger.h"
 #endif
 
 #define LATIN_EXTRA_BEGIN 0xc0 // 0b110xxxxx
@@ -261,8 +261,7 @@ static void utf8decode(const char* hex_str, char* dest)
         }
 
         case OutRange:
-            dest[0] = END;
-
+            *dest = END;
 #if defined (UTF8_DECODER_LOG)
             Log(WARNING, "String is empty, we are out of utf8 range !");
 #endif
@@ -281,7 +280,7 @@ static bool utf8valid(const char *str)
 #if defined (UTF8_DECODER_LOG)
         Log(WARNING, "Null string");
 #endif
-        return -1;
+        return UTF8_BAD_CHAR;
     }
 
     while (*s != END)
@@ -482,7 +481,7 @@ static void utf8chr(const int32_t codepoint, char* dest)
     }
     else
     {
-        dest[0] = END;
+        *dest = END;
 #if defined (UTF8_DECODER_LOG)
         Log(WARNING, "String is empty, we are out of utf8 range !");
 #endif
